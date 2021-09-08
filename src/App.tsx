@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import "./App.css";
+import styles from "./App.module.css";
 
 type Story = {
   objectID: string;
@@ -144,8 +144,8 @@ const App = () => {
   console.log("B:APP");
 
   return (
-    <div className="container">
-      <h1 className="headline-primary">
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}>
         My Hacker Stories with {sumComments} comments
       </h1>
       <SearchForm
@@ -173,7 +173,7 @@ const SearchForm = ({
   onSearchInput,
   onSearchSubmit,
 }: SearchFormProps) => (
-  <form className="search-form" onSubmit={onSearchSubmit}>
+  <form className={styles.searchForm} onSubmit={onSearchSubmit}>
     <InputWithLabel
       id="search"
       value={searchTerm}
@@ -183,7 +183,7 @@ const SearchForm = ({
       <strong>Search:</strong>
     </InputWithLabel>
     <button
-      className="button button small"
+      className={`${styles.button} ${styles.buttonLarge}`}
       type="submit"
       disabled={!searchTerm}
     >
@@ -218,7 +218,7 @@ const InputWithLabel = ({
 
   return (
     <>
-      <label className="label" htmlFor={id}>
+      <label className={styles.label} htmlFor={id}>
         {children}
       </label>
       &nbsp;
@@ -228,7 +228,7 @@ const InputWithLabel = ({
         type={type}
         value={value}
         onChange={onInputChange}
-        className="input"
+        className={styles.input}
       />
     </>
   );
@@ -241,7 +241,7 @@ type ItemProps = {
 
 const Item = ({ item, onRemoveItem }: ItemProps) => {
   return (
-    <div className="item">
+    <div className={styles.item}>
       <span style={{ width: "40%" }}>
         <a href={item.url} target="_blank" rel="noopener noreferrer">
           {item.title}{" "}
@@ -253,7 +253,7 @@ const Item = ({ item, onRemoveItem }: ItemProps) => {
       &nbsp;
       <span style={{ width: "10%" }}>
         <button
-          className="button button_small"
+          className={`${styles.button} ${styles.buttonSmall}`}
           type="button"
           onClick={() => onRemoveItem(item)}
         >
