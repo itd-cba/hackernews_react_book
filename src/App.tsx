@@ -1,6 +1,8 @@
 import React from "react";
 import axios from "axios";
 import styles from "./App.module.css";
+import { ReactComponent as Check } from "./check.svg";
+import { ReactComponent as Search } from "./search.svg";
 
 type Story = {
   objectID: string;
@@ -88,7 +90,6 @@ const storiesReducer = (state: StoryState, action: StoriesAction) => {
   }
 };
 const getSumComments = (stories: StoryState) => {
-  console.log("C");
   return stories.data.reduce((result, value) => result + value.num_comments, 0);
 };
 
@@ -141,8 +142,6 @@ const App = () => {
 
   const sumComments = React.useMemo(() => getSumComments(stories), [stories]);
 
-  console.log("B:APP");
-
   return (
     <div className={styles.container}>
       <h1 className={styles.headlinePrimary}>
@@ -187,7 +186,7 @@ const SearchForm = ({
       type="submit"
       disabled={!searchTerm}
     >
-      Submit
+      <Search width="18px" height="18px" />
     </button>
   </form>
 );
@@ -244,7 +243,7 @@ const Item = ({ item, onRemoveItem }: ItemProps) => {
     <div className={styles.item}>
       <span style={{ width: "40%" }}>
         <a href={item.url} target="_blank" rel="noopener noreferrer">
-          {item.title}{" "}
+          {item.title}
         </a>
       </span>
       <span style={{ width: "30%" }}>{item.author}</span>
@@ -257,7 +256,7 @@ const Item = ({ item, onRemoveItem }: ItemProps) => {
           type="button"
           onClick={() => onRemoveItem(item)}
         >
-          Dismiss
+          <Check height="18px" width="18px" />
         </button>
       </span>
     </div>
@@ -274,8 +273,8 @@ const List = ({ list, onRemoveItem }: ListProps) => (
     {list.map((item) => (
       <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
     ))}
-    ;
   </>
 );
 
 export default App;
+export { SearchForm, InputWithLabel, List, Item };
