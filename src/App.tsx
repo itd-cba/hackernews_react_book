@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./App.module.css";
 import { List } from "./List";
 import { SearchForm } from "./SearchForm";
+import { LastSearches } from "./LastSearches";
 
 export type Story = {
   objectID: string;
@@ -95,6 +96,16 @@ const getSumComments = (stories: StoryState) => {
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
+const extractSearchTerm = (url: string) => url.replace(API_ENDPOINT, "");
+const getLastSearches = (urls: string[]) => {
+  const urlsSet = Array.from(new Set(urls));
+  return urlsSet.slice(-6).slice(0, -1).map(extractSearchTerm);
+};
+
+function getUrl(searchTerm: string) {
+  return `${API_ENDPOINT}${searchTerm}`;
+}
+
 const App = () => {
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     data: [],
@@ -103,13 +114,14 @@ const App = () => {
   });
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-  const [url, setUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
+  const [urls, setUrls] = React.useState([getUrl(searchTerm)]);
 
   const handleFetchStories = React.useCallback(async () => {
     dispatchStories({ type: "STORIES_FETCH_INIT" });
 
     try {
-      const result = await axios.get(url);
+      const lastUrl = urls[urls.length - 1];
+      const result = await axios.get(lastUrl);
 
       dispatchStories({
         type: "STORIES_FETCH_SUCCESS",
@@ -118,7 +130,7 @@ const App = () => {
     } catch {
       dispatchStories({ type: "STORIES_FETCH_FAILURE" });
     }
-  }, [url]);
+  }, [urls]);
 
   React.useEffect(() => {
     handleFetchStories();
@@ -129,7 +141,7 @@ const App = () => {
   };
 
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
+    handleSearch(searchTerm);
     event.preventDefault();
   };
 
@@ -142,6 +154,18 @@ const App = () => {
 
   const sumComments = React.useMemo(() => getSumComments(stories), [stories]);
 
+  const handleLastSearch = (searchTerm: string) => {
+    handleSearch(searchTerm);
+    setSearchTerm(searchTerm);
+  };
+
+  const handleSearch = (searchTerm: string) => {
+    const url = getUrl(searchTerm);
+    setUrls(urls.concat(url));
+  };
+
+  const lastSearches = getLastSearches(urls);
+
   return (
     <div className={styles.container}>
       <h1 className={styles.headlinePrimary}>
@@ -152,6 +176,12 @@ const App = () => {
         onSearchInput={handleSearchInput}
         onSearchSubmit={handleSearchSubmit}
       />
+      <div className={styles.lastSearchBlock}>
+        <LastSearches
+          lastSearches={lastSearches}
+          onLastSearch={handleLastSearch}
+        />
+      </div>
       {stories.isError && <p>Something went wrong...</p>}
       {stories.isLoading ? (
         <p>Loading...</p>

@@ -98,3 +98,11 @@
 
     font-size: 24px;
 }
+
+.lastSearchBlock {
+    padding: 10px;
+}
+.lastSearchBlock > button {
+    display: inline;
+    margin-left: 15px;
+}
