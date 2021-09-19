@@ -3,7 +3,6 @@ import { ReactComponent as Check } from "./check.svg";
 import React from "react";
 import { Stories, Story } from "./App";
 import { sortBy } from "lodash";
-import { lstat } from "fs";
 
 type ItemProps = {
   item: Story;
@@ -83,20 +82,35 @@ const SORTS: (key: SortKey) => (list: Stories) => Stories = (key) => {
   }
 };
 
+const activeButtonClassName = `${styles.button} ${styles.buttonSmall} ${styles.buttonActive}`;
+const inactiveButtonClassName = `${styles.button} ${styles.buttonSmall}`;
+
 export const List = ({ list, onRemoveItem }: ListProps) => {
-  const [sort, setSort] = React.useState(SortKey.NONE);
-  const handleSort = (sortKey: SortKey) => setSort(sortKey);
+  const [sort, setSort] = React.useState({
+    sortKey: SortKey.NONE,
+    isReverse: false,
+  });
 
-  const sortFunction = SORTS(sort);
+  const handleSort = (sortKey: SortKey) => {
+    const isReverse = sort.sortKey === sortKey && !sort.isReverse;
+    setSort({ sortKey, isReverse });
+  };
 
-  const sortedList = sortFunction(list);
+  const sortFunction = SORTS(sort.sortKey);
+
+  const sortedList = sort.isReverse
+    ? sortFunction(list).reverse()
+    : sortFunction(list);
+
+  const getButtonClass = (key: SortKey) =>
+    sort.sortKey === key ? activeButtonClassName : inactiveButtonClassName;
 
   return (
     <div>
       <div className={styles.listHeader}>
         <span style={{ width: "40%" }}>
           <button
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={getButtonClass(SortKey.TITLE)}
             type="button"
             onClick={() => handleSort(SortKey.TITLE)}
           >
@@ -105,7 +119,7 @@ export const List = ({ list, onRemoveItem }: ListProps) => {
         </span>
         <span style={{ width: "30%", fontWeight: "bold" }}>
           <button
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={getButtonClass(SortKey.AUTHOR)}
             type="button"
             onClick={() => handleSort(SortKey.AUTHOR)}
           >
@@ -114,7 +128,7 @@ export const List = ({ list, onRemoveItem }: ListProps) => {
         </span>
         <span style={{ width: "10%", fontWeight: "bold" }}>
           <button
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={getButtonClass(SortKey.COMMENT)}
             type="button"
             onClick={() => handleSort(SortKey.COMMENT)}
           >
@@ -123,7 +137,7 @@ export const List = ({ list, onRemoveItem }: ListProps) => {
         </span>
         <span style={{ width: "10%", fontWeight: "bold" }}>
           <button
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={getButtonClass(SortKey.POINT)}
             type="button"
             onClick={() => handleSort(SortKey.POINT)}
           >
